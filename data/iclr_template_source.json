@@ -1,0 +1,13 @@
+{
+  "source_url": "https://github.com/ICLR/Master-Template/raw/master/iclr2026.zip",
+  "zip_path": "C:\\Users\\wangz\\robotics_60_paper_batch\\14_causal_scene_flow_for_interaction\\data\\iclr2026.zip",
+  "extracted_to": "C:\\Users\\wangz\\robotics_60_paper_batch\\14_causal_scene_flow_for_interaction\\data\\iclr2026_template",
+  "copied": [
+    "iclr2026_conference.sty",
+    "iclr2026_conference.bst",
+    "math_commands.tex",
+    "fancyhdr.sty",
+    "natbib.sty"
+  ],
+  "status": "ok"
+}

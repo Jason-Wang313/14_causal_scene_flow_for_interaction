@@ -1,0 +1,12 @@
+{
+  "rows": 40,
+  "trials_per_row": 2000,
+  "total_trials": 80000,
+  "at_confound_0_noise_0p10_total_success": 1.0,
+  "at_confound_0_noise_0p10_causal_success": 1.0,
+  "at_confound_2_noise_0p10_total_success": 0.0,
+  "at_confound_2_noise_0p10_causal_success": 0.9995,
+  "at_confound_2_noise_0p10_total_distractor": 1.0,
+  "at_confound_2_noise_0p10_causal_distractor": 0.0,
+  "causal_advantage_at_confound_2_noise_0p10": 0.9995
+}

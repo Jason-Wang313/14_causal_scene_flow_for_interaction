@@ -1,0 +1,255 @@
+\documentclass{article}
+\usepackage{iclr2026_conference,times}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{microtype}
+\input{math_commands.tex}
+
+\title{Causal Scene Flow for Interaction}
+
+\author{Anonymous Authors\\
+Anonymous Institution\\
+\texttt{anonymous@example.com}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Scene flow is usually treated as a passive perception target: estimate how every visible
+3D point will move. For a robot that must interact, this target can answer the wrong
+question. A moving point may be caused by a conveyor, camera motion, another object, or
+gravity rather than by the robot action being planned. This paper defines \emph{causal
+scene flow}: a dense action-effect field obtained by subtracting the no-action passive
+future from the action future. The resulting vector field estimates what motion would
+disappear under a do(noop) counterfactual. We prove a simple ranking failure: if a
+passive distractor has larger task-aligned total flow than the controllable contact,
+planning on total scene flow selects the distractor even though it cannot be caused by
+the robot. A runnable synthetic stress test with 80000 trials isolates the
+failure. At passive-confound strength 2.0 and passive-estimation noise 0.10, a
+total-flow planner succeeds in 0.000 of trials and selects the passive
+distractor in 1.000 of trials, while a causal-flow planner succeeds in
+1.000 of trials. The claim is intentionally narrow: causal scene flow is
+a planning estimand and diagnostic mechanism, not yet a learned real-robot system.
+\end{abstract}
+
+\section{Introduction}
+
+Dense motion fields are attractive for embodied intelligence because they are geometric,
+local, and compatible with contact-rich tasks. Scene-flow systems estimate 3D point
+motion from stereo, RGB-D, lidar, or point clouds \citep{flownet3d,pointpwc,raft3d,nsfp}.
+Manipulation systems then often use predicted motion, correspondences, or affordance
+vectors to choose where to act \citep{flowbot3d,transporter,denseobjectnets,se3nets}.
+This link is natural, but it hides a causal assumption: the visible motion that is useful
+for prediction is also the motion the robot can cause.
+
+That assumption is false in many robot scenes. A drawer may slide because a human opened
+it. A cable may move because another object pulled it. A point cloud on a conveyor may
+have large task-aligned displacement even if the gripper cannot affect it. A camera may
+move while the robot acts. A passive scene-flow estimator can predict these motions well,
+yet a planner that treats them as controllable affordances will select the wrong contact
+or overestimate progress.
+
+We propose to change the central variable. Instead of planning over total predicted flow,
+the robot should plan over the action's dense treatment effect:
+\[
+  C_a(s,x) =
+  \mathbb{E}[\Delta X(x) \mid do(a),s] -
+  \mathbb{E}[\Delta X(x) \mid do(a_0),s],
+\]
+where \(a_0\) is a no-action or passive baseline. \(C_a\) asks which displacement at
+point \(x\) would disappear if the robot did not intervene. We call this field causal
+scene flow.
+
+The paper makes three contributions. First, it defines causal scene flow as a dense
+robot-action effect field rather than a better scene-flow architecture. Second, it proves
+a minimal counterexample showing why total-flow planning is not invariant to passive
+confounding. Third, it releases a small synthetic stress test and the full literature
+audit used to pressure-test the novelty boundary.
+
+\section{Related Work and Novelty Boundary}
+
+\paragraph{3D scene flow.}
+Classical and learned scene-flow work estimates dense 3D motion from paired observations,
+using interpolation, cost volumes, recurrent updates, rigid-motion embeddings, or neural
+priors \citep{sceneflowfields,flownet3d,pointpwc,raft3d,nsfp,flowstep3d}. These papers
+make dense 3D motion prediction non-novel. Our claim is not improved correspondence or
+lower endpoint error. The difference is the estimand: total displacement \(P+E\) versus
+the robot-caused effect \(E\).
+
+\paragraph{Flow and correspondences for manipulation.}
+Robotic manipulation systems use dense descriptors, feature transport, object flow, and
+articulation flow to guide action \citep{denseobjectnets,transporter,flowbot3d,flowbotpp}.
+FlowBot3D is the closest hostile prior because it predicts a dense per-point motion
+direction for articulated objects and plans from that field. Causal scene flow is
+different only if it separates motion that would happen anyway from motion caused by the
+robot. Thus, ``flow for manipulation'' is not the contribution; do-differenced flow is.
+
+\paragraph{Action-conditioned prediction and causal confusion.}
+Visual foresight and learned dynamics plan by predicting action-conditioned futures
+\citep{visualforesight,interactionnetworks,pushinggrasping}. Causal-inference work warns
+that policies can rely on action-correlated but non-causal variables
+\citep{causalconfusion,pearl}. Our paper joins these ideas at the dense 3D field level:
+the causal variable is not a scalar reward or latent factor, but a pointwise effect field
+usable by a manipulation planner.
+
+\section{Causal Scene Flow}
+
+Let \(s_t\) be a robot scene containing a point set \(X_t=\{x_i\}_{i=1}^n\), an action
+\(a\), and a no-action baseline \(a_0\). Let \(X_{t+1}^{a}(x_i)\) denote the potential
+next position of point \(x_i\) under intervention \(do(a)\). The usual action-conditioned
+total scene flow is
+\[
+  F_a(s_t,x_i)=\mathbb{E}[X_{t+1}^{a}(x_i)-x_i\mid s_t].
+\]
+The passive flow is \(P(s_t,x_i)=F_{a_0}(s_t,x_i)\). We define:
+
+\begin{definition}[Causal scene flow]
+The causal scene flow of action \(a\) at point \(x_i\) is
+\[
+  C_a(s_t,x_i)=F_a(s_t,x_i)-F_{a_0}(s_t,x_i).
+\]
+It is the conditional average treatment effect of action \(a\) relative to no action,
+expressed as a 3D vector field.
+\end{definition}
+
+A simple contact planner can score an action/contact pair by the task-aligned caused
+motion:
+\[
+  J_{\mathrm{cause}}(a,k)=\sum_i w_{ik}\langle C_a(s_t,x_i),g_i\rangle,
+\]
+where \(g_i\) is a local progress direction and \(w_{ik}\) selects points affected by
+candidate contact \(k\). The corresponding total-flow planner replaces \(C_a\) with
+\(F_a\). The distinction is small in notation and large in behavior: \(F_a\) rewards
+motion whether or not the robot caused it.
+
+\section{A Minimal Failure Result}
+
+\begin{proposition}[Passive-flow distractor]
+Consider two candidate contacts, a controllable contact \(c\) and a passive distractor
+\(d\). Let \(g\) be the task progress direction, \(P_i\) passive flow, and \(E_i\)
+robot-caused effect, so total flow is \(F_i=P_i+E_i\). If
+\[
+  \langle P_d+E_d,g\rangle > \langle P_c+E_c,g\rangle
+  \quad\text{and}\quad
+  \langle E_c,g\rangle > \langle E_d,g\rangle,
+\]
+then ranking by total scene flow selects \(d\), while ranking by causal scene flow
+selects \(c\).
+\end{proposition}
+
+\begin{proof}
+The total-flow planner chooses the candidate with larger \(\langle F_i,g\rangle\), so
+the first inequality makes it choose \(d\). The causal-flow planner subtracts passive
+flow and ranks \(\langle F_i-P_i,g\rangle=\langle E_i,g\rangle\), so the second
+inequality makes it choose \(c\).
+\end{proof}
+
+The same statement is stable under bounded estimation error. If the causal score errors
+are at most \(\epsilon\) and
+\(\langle E_c,g\rangle-\langle E_d,g\rangle>2\epsilon\), the causal ranking is unchanged.
+This margin is also the practical weakness of the proposal: estimating the no-action
+future must be accurate enough to preserve action-effect margins.
+
+\section{Synthetic Stress Test}
+
+The experiment in \texttt{experiments/causal\_scene\_flow\_sim.py} creates a tabletop
+point cloud with candidate contacts. One point has a robot-caused effect aligned with
+the task. A different point is a passive distractor whose no-action motion is also
+aligned with the task but cannot be caused by the robot. We sweep the distractor's
+passive-flow strength and the noise in the passive-flow estimate. Each grid cell uses
+2,000 trials, for 80000 total trials.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.48\linewidth]{../figures/example_scene_flow_decomposition.pdf}
+\hfill
+\includegraphics[width=0.48\linewidth]{../figures/passive_confounding_success.pdf}
+\caption{Left: in a representative scene, total scene flow points to the passive
+distractor, while causal effect flow points to the controllable contact. Right: as the
+aligned passive confound grows, the total-flow planner fails; causal-flow planning is
+robust until no-action estimation noise becomes comparable to the effect margin.}
+\label{fig:stress}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Stress-test readout. Success means selecting a contact whose actual
+robot-caused progress exceeds 0.5 along the task direction.}
+\label{tab:stress}
+\begin{tabular}{lccc}
+\toprule
+Setting & Total-flow success & Causal-flow success & Total chooses distractor \\
+\midrule
+Confound 0.0, noise 0.10 & 1.000 & 1.000 & -- \\
+Confound 2.0, noise 0.10 & 0.000 & 1.000 & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The result is intentionally stark. With no aligned passive confound, both planners solve
+the task. When the passive distractor's task-aligned motion is twice the nominal caused
+effect and passive estimation noise is 0.10, total-flow success is 0.000
+because it ranks the passive distractor first; causal-flow success is
+1.000. This does not show that a learned causal-flow estimator will work
+on real robots. It shows that the assumption "large predicted flow implies useful
+manipulation affordance" can be false for a reason a total-flow objective cannot repair.
+
+\section{Discussion}
+
+Causal scene flow is best viewed as a planning estimand. It can be estimated in several
+ways: paired action/no-action rollouts, a passive world model plus an action-conditioned
+world model, interventional robot data with matched scene state, or analytic subtraction
+when camera and conveyor motion are known. This paper does not argue for a specific
+backbone. A bigger scene-flow network trained on total displacement would still optimize
+the wrong variable in the proposition above.
+
+The no-action baseline is both the key and the liability. If the passive future is
+misspecified, the residual can erase real effects or hallucinate controllability. Future
+robot experiments should measure not only endpoint flow error but also action-effect
+ranking error: whether the selected contact moves because of the robot.
+
+\section{Limitations}
+
+The evidence is synthetic. There is no real-robot experiment, no learned RGB-D estimator,
+and no claim of state-of-the-art scene-flow accuracy. The literature sweep is broad and
+auditable, but its extraction fields are based on metadata and abstracts plus manual
+anchor papers, not a complete full-text review of all 1,200 entries. The proposed
+definition also assumes that a meaningful no-action counterfactual exists and can be
+conditioned on the same state, which is difficult in fast-changing real scenes.
+
+\section{Conclusion}
+
+For interaction, the relevant flow is not simply what moves next. It is what the robot's
+action causes to move. Causal scene flow turns this distinction into a dense 3D planning
+variable by subtracting the passive no-action future from the action future. The formal
+counterexample and synthetic stress test show why the distinction can change the selected
+contact. The next step is to learn this estimand from real robot interventions and test
+whether it improves manipulation under moving cameras, conveyors, humans, and other
+passive dynamics.
+
+\subsubsection*{Reproducibility Statement}
+The repository contains the literature-generation script, the synthetic experiment, raw
+CSV outputs, generated figures, and the exact ICLR 2026 style files downloaded from the
+official ICLR Master-Template repository. Running
+\texttt{python experiments/causal\_scene\_flow\_sim.py} regenerates the evidence used in
+Tables~\ref{tab:stress} and Figure~\ref{fig:stress}.
+
+\bibliography{references}
+\bibliographystyle{iclr2026_conference}
+
+\appendix
+\section{Additional Audit Details}
+
+The novelty audit identified 22 hidden assumptions, 1,200 landscape papers, 300
+serious-skim entries, 225 deep-read pressure entries, and a 100-paper hostile prior-work
+set. The closest threats are dense scene-flow estimators, articulation-flow manipulation
+methods, action-conditioned visual dynamics, and causal-confusion papers. The surviving
+boundary is the dense do-differenced flow field used directly as the planning score.
+
+\end{document}

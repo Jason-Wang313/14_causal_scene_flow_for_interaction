@@ -1,0 +1,1 @@
+completed literature sweep: {"deep_read": 225, "hostile_prior": 100, "serious_skim": 300, "total": 1200}
