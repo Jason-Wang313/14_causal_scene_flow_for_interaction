@@ -1,7 +1,7 @@
 # Child Status
 
 - Paper: 14, `causal_scene_flow_for_interaction`
-- Stage: paper compiled; preparing GitHub push and final audit
+- Stage: parent recovery complete
 - Current facts:
   - `plan.md` created with staged execution plan.
   - Workspace: `C:\Users\wangz\robotics_60_paper_batch\14_causal_scene_flow_for_interaction`
@@ -19,6 +19,9 @@
   - Paper source and bibliography generated in `paper/`.
   - PDF compiled successfully and copied to `C:/Users/wangz/Downloads/14.pdf`.
   - Build warnings remaining: one tiny overfull hbox and MiKTeX update reminder; no unresolved references/citations in final pass.
+  - Parent recovery copied `14.pdf` to `C:/Users/wangz/OneDrive/Desktop/14.pdf`.
+  - Parent recovery published the repository at `https://github.com/Jason-Wang313/14_causal_scene_flow_for_interaction`.
+  - Parent recovery wrote `docs/build_status.md`, `docs/final_audit.md`, and `data/github_push_status.json`.
 - Exact commands/actions so far:
   - `apply_patch` add `plan.md`
   - `apply_patch` add `child_status.md`
@@ -46,8 +49,9 @@
   - First strict literature rerun produced only 858 relevant entries; recovered by adding targeted queries and rerunning to 1200 entries.
 - Recovery steps:
   - Preserved strict domain filter and broadened with focused robotics/3D/manipulation searches instead of loosening relevance.
+  - Parent monitor recovered the publish/final-audit step after child exit 999.
 - Next:
-  - Commit repo, create/push public GitHub repo, write final audit.
+  - Queue row must be marked `SUCCESS` by parent monitor.
 
 Exit code: 999
 End time: 2026-06-11 13:34:35 +01:00

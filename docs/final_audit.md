@@ -13,6 +13,8 @@
 - PDF size: 206005 bytes
 - PDF pages: 5
 - Source repository folder: `C:/Users/wangz/robotics_60_paper_batch/14_causal_scene_flow_for_interaction`
+- GitHub repository: `https://github.com/Jason-Wang313/14_causal_scene_flow_for_interaction`
+- Initial commit: `1a7fbb7`
 
 ## Evidence Package
 
@@ -43,4 +45,4 @@ Final log scan found no unresolved references or citations.
 
 ## Parent Recovery Notes
 
-The child produced the PDF and repository assets but exited with code 999 after a tool timeout before GitHub publishing and final audit. Parent recovery preserves the generated assets, publishes the repository, records GitHub status, updates the queue row to `SUCCESS`, and leaves the Paper 15 runner alive.
+The child produced the PDF and repository assets but exited with code 999 after a tool timeout before GitHub publishing and final audit. Parent recovery preserved the generated assets, published the repository, recorded GitHub status, updated the queue row to `SUCCESS`, and left the Paper 15 runner alive.
