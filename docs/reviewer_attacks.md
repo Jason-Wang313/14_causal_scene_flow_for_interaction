@@ -18,7 +18,7 @@ Response: Correct. The result is a controlled counterexample designed to prove t
 
 ## Attack 5: Estimating the passive future is hard.
 
-Response: Also correct. The proposition includes a passive-estimation margin; the simulation sweeps passive-estimation noise. The mechanism is valuable only when the no-action baseline is more accurate than the action-effect margin.
+Response: Also correct. The proposition includes a passive-estimation margin; the simulation sweeps passive-estimation noise, and the v2 stress directly corrupts the no-action estimate. At confound strength 2.0/noise 0.10, calibrated residual success is 1.000; 50% passive under-subtraction drops success to 0.387; 75% action-effect leakage drops success to 0.505. The mechanism is valuable only when the no-action baseline is more accurate than the action-effect margin and is not trained in a way that leaks robot-caused motion into the passive prediction.
 
 ## Attack 6: If passive flow is constant across actions, it cancels.
 
@@ -43,3 +43,7 @@ Response: The title is acceptable only if the paper clearly frames interaction a
 ## Numeric Stress Point
 
 At confound strength 2.0/noise 0.10, total-flow success is 0.000; causal-flow success is 1.000. This is a counterexample regime, not a representative benchmark average.
+
+## V2 Boundary Stress Point
+
+In the same regime, calibrated residual success is 1.000. Under-subtracting passive flow by 50% lowers residual success to 0.387 and raises residual distractor selection to 0.613. Leaking 75% of the action effect into the no-action estimate lowers success to 0.505.
