@@ -56,3 +56,15 @@
 Exit code: 999
 End time: 2026-06-11 13:34:35 +01:00
 PDF exists: True
+
+## Submission-hardening v2 terminal status
+
+Checked: 2026-06-12 23:49:37 +01:00
+
+- Added passive-baseline misspecification stress tests for under-subtraction and action-effect leakage.
+- Main counterexample retained: total-flow success 0.000 versus calibrated residual success 1.000 at confound 2.0/noise 0.10.
+- 50% passive under-subtraction: residual success 0.387 and residual distractor selection 0.613.
+- 75% action-effect leakage into the no-action estimate: residual success 0.505.
+- Rebuilt the manuscript and copied the canonical v2 PDF to `C:/Users/wangz/Downloads/14.pdf` (210,277 bytes).
+- Local `paper/main.pdf` was removed by the build helper; no new Desktop copy was created during v2 hardening.
+- Terminal decision: workshop-only / revise before main-conference submission.

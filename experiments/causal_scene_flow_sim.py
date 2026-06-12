@@ -17,12 +17,19 @@ import math
 import random
 from pathlib import Path
 
+try:
+    import numpy as np
+except Exception:  # pragma: no cover - stdlib fallback stays available.
+    np = None
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 FIGS = ROOT / "figures"
 RESULTS = DATA / "experiment_results.csv"
 SUMMARY = DATA / "experiment_summary.json"
+MISSPEC = DATA / "passive_misspecification_stress.csv"
+MISSPEC_TEX = DATA / "passive_misspecification_table.tex"
 EVIDENCE_MD = ROOT / "docs" / "evidence_summary.md"
 
 
@@ -38,6 +45,10 @@ def sub(a: tuple[float, float, float], b: tuple[float, float, float]) -> tuple[f
     return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
 
 
+def mul(a: tuple[float, float, float], scale: float) -> tuple[float, float, float]:
+    return (scale * a[0], scale * a[1], scale * a[2])
+
+
 def noise_vec(rng: random.Random, sigma: float) -> tuple[float, float, float]:
     return (rng.gauss(0.0, sigma), rng.gauss(0.0, sigma), rng.gauss(0.0, sigma))
 
@@ -46,6 +57,8 @@ def run_trial(
     rng: random.Random,
     confound_strength: float,
     passive_estimation_noise: float,
+    passive_scale: float = 1.0,
+    passive_effect_leak: float = 0.0,
     candidates: int = 28,
 ) -> dict[str, float | int]:
     goal = (1.0, 0.0, 0.0)
@@ -77,7 +90,8 @@ def run_trial(
         passive.append(base_passive)
         effect.append(base_effect)
         observed_total.append(add(add(base_passive, base_effect), noise_vec(rng, 0.035)))
-        passive_estimate.append(add(base_passive, noise_vec(rng, passive_estimation_noise)))
+        estimated_passive = add(mul(base_passive, passive_scale), mul(base_effect, passive_effect_leak))
+        passive_estimate.append(add(estimated_passive, noise_vec(rng, passive_estimation_noise)))
 
     causal_estimate = [sub(observed_total[i], passive_estimate[i]) for i in range(candidates)]
 
@@ -109,30 +123,147 @@ def aggregate(values: list[dict[str, float | int]], key: str) -> float:
     return sum(float(row[key]) for row in values) / max(1, len(values))
 
 
+def run_trial_batch(
+    seed: int,
+    trials: int,
+    confound_strength: float,
+    passive_estimation_noise: float,
+    passive_scale: float = 1.0,
+    passive_effect_leak: float = 0.0,
+    candidates: int = 28,
+) -> dict[str, float]:
+    if np is None:
+        rng = random.Random(seed)
+        trial_rows = [
+            run_trial(
+                rng,
+                confound_strength,
+                passive_estimation_noise,
+                passive_scale=passive_scale,
+                passive_effect_leak=passive_effect_leak,
+                candidates=candidates,
+            )
+            for _ in range(trials)
+        ]
+        return {
+            "total_success_rate": aggregate(trial_rows, "total_success"),
+            "causal_success_rate": aggregate(trial_rows, "causal_success"),
+            "oracle_success_rate": aggregate(trial_rows, "oracle_success"),
+            "total_mean_progress": aggregate(trial_rows, "total_progress"),
+            "causal_mean_progress": aggregate(trial_rows, "causal_progress"),
+            "oracle_mean_progress": aggregate(trial_rows, "oracle_progress"),
+            "total_distractor_rate": aggregate(trial_rows, "total_chose_distractor"),
+            "causal_distractor_rate": aggregate(trial_rows, "causal_chose_distractor"),
+        }
+
+    rng = np.random.default_rng(seed)
+    true_contact = rng.integers(0, candidates, size=trials)
+    distractor = rng.integers(0, candidates - 1, size=trials)
+    distractor = distractor + (distractor >= true_contact)
+
+    passive_x = rng.normal(0.0, 0.04, size=(trials, candidates))
+    effect_x = rng.normal(0.0, 0.04, size=(trials, candidates))
+    row_idx = np.arange(trials)
+
+    effect_x[row_idx, true_contact] += rng.uniform(0.75, 1.10, size=trials)
+    passive_x[row_idx, true_contact] += rng.normal(0.0, 0.08, size=trials)
+
+    passive_x[row_idx, distractor] += confound_strength * rng.uniform(0.75, 1.25, size=trials)
+    effect_x[row_idx, distractor] += rng.uniform(-0.10, 0.08, size=trials)
+
+    candidate_mask = np.ones((trials, candidates), dtype=bool)
+    candidate_mask[row_idx, true_contact] = False
+    candidate_mask[row_idx, distractor] = False
+    nuisance_mask = (rng.random((trials, candidates)) < 0.20) & candidate_mask
+    passive_x += nuisance_mask * confound_strength * rng.uniform(0.05, 0.35, size=(trials, candidates))
+    effect_x += candidate_mask * rng.uniform(-0.15, 0.22, size=(trials, candidates))
+
+    observed_x = passive_x + effect_x + rng.normal(0.0, 0.035, size=(trials, candidates))
+    passive_estimate_x = (
+        passive_scale * passive_x
+        + passive_effect_leak * effect_x
+        + rng.normal(0.0, passive_estimation_noise, size=(trials, candidates))
+    )
+    causal_x = observed_x - passive_estimate_x
+
+    total_choice = np.argmax(observed_x, axis=1)
+    causal_choice = np.argmax(causal_x, axis=1)
+    oracle_choice = np.argmax(effect_x, axis=1)
+
+    total_progress = effect_x[row_idx, total_choice]
+    causal_progress = effect_x[row_idx, causal_choice]
+    oracle_progress = effect_x[row_idx, oracle_choice]
+    return {
+        "total_success_rate": float(np.mean(total_progress > 0.50)),
+        "causal_success_rate": float(np.mean(causal_progress > 0.50)),
+        "oracle_success_rate": float(np.mean(oracle_progress > 0.50)),
+        "total_mean_progress": float(np.mean(total_progress)),
+        "causal_mean_progress": float(np.mean(causal_progress)),
+        "oracle_mean_progress": float(np.mean(oracle_progress)),
+        "total_distractor_rate": float(np.mean(total_choice == distractor)),
+        "causal_distractor_rate": float(np.mean(causal_choice == distractor)),
+    }
+
+
 def run_grid() -> list[dict[str, float]]:
-    rng = random.Random(14)
     rows = []
     confounds = [0.0, 0.25, 0.50, 0.75, 1.0, 1.5, 2.0, 3.0]
     noises = [0.0, 0.05, 0.10, 0.20, 0.35]
     trials = 2000
+    row_id = 0
     for confound in confounds:
         for passive_noise in noises:
-            trial_rows = [run_trial(rng, confound, passive_noise) for _ in range(trials)]
+            metrics = run_trial_batch(14000 + row_id, trials, confound, passive_noise)
             rows.append(
                 {
                     "confound_strength": confound,
                     "passive_estimation_noise": passive_noise,
                     "trials": trials,
-                    "total_success_rate": aggregate(trial_rows, "total_success"),
-                    "causal_success_rate": aggregate(trial_rows, "causal_success"),
-                    "oracle_success_rate": aggregate(trial_rows, "oracle_success"),
-                    "total_mean_progress": aggregate(trial_rows, "total_progress"),
-                    "causal_mean_progress": aggregate(trial_rows, "causal_progress"),
-                    "oracle_mean_progress": aggregate(trial_rows, "oracle_progress"),
-                    "total_distractor_rate": aggregate(trial_rows, "total_chose_distractor"),
-                    "causal_distractor_rate": aggregate(trial_rows, "causal_chose_distractor"),
+                    **metrics,
                 }
             )
+            row_id += 1
+    return rows
+
+
+def run_misspecification_stress() -> list[dict[str, float | str]]:
+    trials = 2000
+    settings = [
+        ("calibrated_noop", 1.0, 0.0),
+        ("under_subtract_10pct", 0.90, 0.0),
+        ("under_subtract_25pct", 0.75, 0.0),
+        ("under_subtract_50pct", 0.50, 0.0),
+        ("no_subtraction", 0.0, 0.0),
+        ("over_subtract_25pct", 1.25, 0.0),
+        ("effect_leak_25pct", 1.0, 0.25),
+        ("effect_leak_50pct", 1.0, 0.50),
+        ("effect_leak_75pct", 1.0, 0.75),
+    ]
+    rows: list[dict[str, float | str]] = []
+    for row_id, (label, passive_scale, passive_effect_leak) in enumerate(settings):
+        metrics = run_trial_batch(
+            14200 + row_id,
+            trials,
+            confound_strength=2.0,
+            passive_estimation_noise=0.10,
+            passive_scale=passive_scale,
+            passive_effect_leak=passive_effect_leak,
+        )
+        rows.append(
+            {
+                "scenario": label,
+                "confound_strength": 2.0,
+                "passive_estimation_noise": 0.10,
+                "passive_scale": passive_scale,
+                "passive_effect_leak": passive_effect_leak,
+                "trials": trials,
+                "total_success_rate": metrics["total_success_rate"],
+                "residual_success_rate": metrics["causal_success_rate"],
+                "oracle_success_rate": metrics["oracle_success_rate"],
+                "residual_distractor_rate": metrics["causal_distractor_rate"],
+                "residual_mean_progress": metrics["causal_mean_progress"],
+            }
+        )
     return rows
 
 
@@ -161,6 +292,43 @@ def write_results(rows: list[dict[str, float]]) -> dict[str, float]:
     }
     SUMMARY.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
+
+
+def latex_label(label: str) -> str:
+    return label.replace("_", r"\_")
+
+
+def write_misspecification_results(rows: list[dict[str, float | str]]) -> None:
+    with MISSPEC.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    selected = [
+        "calibrated_noop",
+        "under_subtract_25pct",
+        "under_subtract_50pct",
+        "effect_leak_50pct",
+        "effect_leak_75pct",
+        "no_subtraction",
+    ]
+    row_by_name = {str(row["scenario"]): row for row in rows}
+    lines = [
+        r"\begin{tabular}{lccc}",
+        r"\toprule",
+        r"No-action estimate & Residual success & Residual distractor & Mean caused progress \\",
+        r"\midrule",
+    ]
+    for name in selected:
+        row = row_by_name[name]
+        lines.append(
+            f"{latex_label(name)} & "
+            f"{float(row['residual_success_rate']):.3f} & "
+            f"{float(row['residual_distractor_rate']):.3f} & "
+            f"{float(row['residual_mean_progress']):.3f} \\\\"
+        )
+    lines.extend([r"\bottomrule", r"\end{tabular}", ""])
+    MISSPEC_TEX.write_text("\n".join(lines), encoding="utf-8")
 
 
 def try_plot(rows: list[dict[str, float]]) -> bool:
@@ -270,7 +438,12 @@ def try_plot(rows: list[dict[str, float]]) -> bool:
     return True
 
 
-def write_evidence_md(summary: dict[str, float], plotted: bool) -> None:
+def write_evidence_md(summary: dict[str, float], misspec_rows: list[dict[str, float | str]], plotted: bool) -> None:
+    misspec_by_name = {str(row["scenario"]): row for row in misspec_rows}
+    calibrated = misspec_by_name["calibrated_noop"]
+    under_50 = misspec_by_name["under_subtract_50pct"]
+    leak_75 = misspec_by_name["effect_leak_75pct"]
+    no_sub = misspec_by_name["no_subtraction"]
     EVIDENCE_MD.parent.mkdir(parents=True, exist_ok=True)
     EVIDENCE_MD.write_text(
         "\n".join(
@@ -286,9 +459,11 @@ def write_evidence_md(summary: dict[str, float], plotted: bool) -> None:
                 f"- At passive-confound strength 2.0 and passive-estimation noise 0.10, total-flow success is {summary['at_confound_2_noise_0p10_total_success']:.3f}; causal-flow success is {summary['at_confound_2_noise_0p10_causal_success']:.3f}.",
                 f"- At that setting, the total-flow planner chooses the passive distractor {summary['at_confound_2_noise_0p10_total_distractor']:.3f} of trials; causal-flow chooses it {summary['at_confound_2_noise_0p10_causal_distractor']:.3f}.",
                 f"- Causal advantage at confound 2.0/noise 0.10: {summary['causal_advantage_at_confound_2_noise_0p10']:.3f}.",
+                f"- V2 misspecification stress at confound 2.0/noise 0.10: calibrated no-op residual success is {float(calibrated['residual_success_rate']):.3f}; under-subtracting passive flow by 50% lowers residual success to {float(under_50['residual_success_rate']):.3f}; leaking 75% of the robot effect into the no-op estimate lowers success to {float(leak_75['residual_success_rate']):.3f}; no subtraction has success {float(no_sub['residual_success_rate']):.3f}.",
                 f"- Plots generated: {'yes' if plotted else 'no'}",
                 "",
                 "Interpretation: the evidence supports the mechanistic claim that planning on total flow is not invariant to passive exogenous motion, while planning on a do-difference field is robust when the passive estimate is accurate enough. It does not support claims about real-robot performance, learned perception accuracy, or benchmark superiority.",
+                "The v2 stress makes the main boundary explicit: the no-action future must be calibrated and uncontaminated by the robot action, or the residual can collapse toward total-flow behavior or erase true action effects.",
                 "",
             ]
         ),
@@ -300,9 +475,12 @@ def main() -> int:
     print("running causal scene flow simulation", flush=True)
     rows = run_grid()
     summary = write_results(rows)
+    misspec_rows = run_misspecification_stress()
+    write_misspecification_results(misspec_rows)
     plotted = try_plot(rows)
-    write_evidence_md(summary, plotted)
+    write_evidence_md(summary, misspec_rows, plotted)
     print(json.dumps(summary, indent=2), flush=True)
+    print("wrote passive misspecification stress", flush=True)
     return 0
 
 

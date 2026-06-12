@@ -19,6 +19,10 @@ Anonymous Institution\\
 
 \begin{document}
 \maketitle
+\noindent\textbf{Submission-hardening v2, 2026-06-12.}
+Added passive-baseline misspecification stress tests. The paper remains a
+mechanism-and-counterexample paper: causal flow helps only when the no-action
+future is calibrated and uncontaminated by robot action effects.
 
 \begin{abstract}
 Scene flow is usually treated as a passive perception target: estimate how every visible
@@ -34,8 +38,11 @@ the robot. A runnable synthetic stress test with 80000 trials isolates the
 failure. At passive-confound strength 2.0 and passive-estimation noise 0.10, a
 total-flow planner succeeds in 0.000 of trials and selects the passive
 distractor in 1.000 of trials, while a causal-flow planner succeeds in
-1.000 of trials. The claim is intentionally narrow: causal scene flow is
-a planning estimand and diagnostic mechanism, not yet a learned real-robot system.
+1.000 of trials. A v2 misspecification audit shows the boundary: under-subtracting
+the passive field by 50\% drops residual-planner success to 0.387, and leaking
+75\% of the robot effect into the no-action estimate drops it to 0.505. The claim
+is intentionally narrow: causal scene flow is a planning estimand and diagnostic
+mechanism, not yet a learned real-robot system.
 \end{abstract}
 
 \section{Introduction}
@@ -200,6 +207,24 @@ because it ranks the passive distractor first; causal-flow success is
 on real robots. It shows that the assumption "large predicted flow implies useful
 manipulation affordance" can be false for a reason a total-flow objective cannot repair.
 
+\begin{table}[t]
+\centering
+\caption{V2 no-action misspecification stress at confound strength 2.0 and passive
+estimation noise 0.10. Residual success is the causal-flow planner's success after
+subtracting the listed no-action estimate.}
+\label{tab:misspec}
+\input{../data/passive_misspecification_table.tex}
+\end{table}
+
+Table~\ref{tab:misspec} turns the main assumption into a failure boundary. Mild
+under-subtraction preserves most of the advantage, but leaving half of the passive
+field in the residual drops success to 0.387 and makes the residual planner choose
+the passive distractor in 0.613 of trials. Conversely, if a learned no-action model
+is contaminated by the robot's action effect, it can subtract away true causal motion:
+75\% effect leakage leaves only 0.505 success. The method therefore requires a
+matched, calibrated passive counterfactual; it is not a magic background-subtraction
+wrapper.
+
 \section{Discussion}
 
 Causal scene flow is best viewed as a planning estimand. It can be estimated in several
@@ -221,7 +246,9 @@ and no claim of state-of-the-art scene-flow accuracy. The literature sweep is br
 auditable, but its extraction fields are based on metadata and abstracts plus manual
 anchor papers, not a complete full-text review of all 1,200 entries. The proposed
 definition also assumes that a meaningful no-action counterfactual exists and can be
-conditioned on the same state, which is difficult in fast-changing real scenes.
+conditioned on the same state, which is difficult in fast-changing real scenes. The v2
+stress test demonstrates that this is not merely philosophical: a poorly calibrated or
+action-contaminated no-action predictor can remove most of the advantage.
 
 \section{Conclusion}
 

@@ -21,3 +21,12 @@ python scripts/build_paper.py
 ```
 
 The final compiled paper is written to `C:/Users/wangz/Downloads/14.pdf`.
+
+## Submission-Hardening v2
+
+- Added vectorized regeneration for the 80,000-trial synthetic grid.
+- Added passive-baseline misspecification stress in `data/passive_misspecification_stress.csv`.
+- Calibrated no-op residual success is 1.000 at confound 2.0/noise 0.10.
+- Under-subtracting the passive field by 50% lowers residual success to 0.387.
+- Leaking 75% of the robot effect into the no-action estimate lowers residual success to 0.505.
+- Decision remains workshop-only until tested with learned no-op predictors and real or high-fidelity robot scenes.

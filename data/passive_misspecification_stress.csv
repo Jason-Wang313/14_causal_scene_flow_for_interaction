@@ -1,0 +1,10 @@
+scenario,confound_strength,passive_estimation_noise,passive_scale,passive_effect_leak,trials,total_success_rate,residual_success_rate,oracle_success_rate,residual_distractor_rate,residual_mean_progress
+calibrated_noop,2.0,0.1,1.0,0.0,2000,0.0,1.0,1.0,0.0,0.9277744996851621
+under_subtract_10pct,2.0,0.1,0.9,0.0,2000,0.0,1.0,1.0,0.0,0.9268155525674868
+under_subtract_25pct,2.0,0.1,0.75,0.0,2000,0.0,0.984,1.0,0.0155,0.9147397625136331
+under_subtract_50pct,2.0,0.1,0.5,0.0,2000,0.0,0.387,1.0,0.6125,0.3762215693650288
+no_subtraction,2.0,0.1,0.0,0.0,2000,0.0,0.0005,1.0,0.9995,-0.0073365731503978494
+over_subtract_25pct,2.0,0.1,1.25,0.0,2000,0.0,0.9995,1.0,0.0,0.9214039089613231
+effect_leak_25pct,2.0,0.1,1.0,0.25,2000,0.0,0.998,1.0,0.0,0.9232959624440389
+effect_leak_50pct,2.0,0.1,1.0,0.5,2000,0.0,0.939,1.0,0.0015,0.8816346703480228
+effect_leak_75pct,2.0,0.1,1.0,0.75,2000,0.0,0.5055,1.0,0.0145,0.5298413917027905
