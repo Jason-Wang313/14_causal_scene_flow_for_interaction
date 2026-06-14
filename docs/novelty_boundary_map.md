@@ -14,12 +14,14 @@
 - Treating robot-caused flow as a treatment effect: `C_a(s,x)=E[Delta x | do(a),s]-E[Delta x | do(noop),s]`.
 - Making the planner optimize the caused component rather than the total future displacement.
 - Showing a formal counterexample where total-flow planning provably chooses a passive distractor.
-- Providing a runnable stress test in which increasing passive motion breaks total-flow ranking while causal effect flow remains accurate when the no-action baseline is accurate.
+- Providing a full-scale synthetic stress suite in which increasing passive motion breaks total-flow ranking while causal effect flow remains accurate when the no-action baseline is calibrated.
+- Demonstrating that endpoint error relative to total flow can be anti-aligned with interaction success.
 
 ## Boundary Conditions
 
 - If passive dynamics are zero or identical across all candidate actions, total-flow and causal-flow rankings can coincide.
 - If passive no-action flow is estimated poorly enough to exceed the action-effect margin, causal-flow planning can fail.
+- If the no-action estimate leaks robot-caused effects, the residual can erase the action effect.
 - If a prior method already computes an intervention-defined dense 3D do-difference field and plans on it directly, this paper's novelty collapses to exposition.
 - The current evidence does not establish real-robot success or learned estimator quality.
 

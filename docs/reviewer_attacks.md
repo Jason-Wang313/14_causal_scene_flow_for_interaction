@@ -2,48 +2,49 @@
 
 ## Attack 1: This is just background subtraction.
 
-Response: In the simplest case it reduces to subtracting a no-action passive flow, but the definition is intervention-based. The baseline is `do(noop)` conditioned on the same state, not a geometric background mask. That matters for articulated objects, moving cameras, conveyors, and multi-object scenes where passive object motion is foreground but still not robot-caused.
+Response: In the simplest case it resembles subtracting a no-action passive flow, but the estimand is intervention-defined: `do(action)` minus `do(noop)` conditioned on the same state. The v3 paper emphasizes this distinction for moving foreground objects, conveyors, ego-motion, and passive distractors where geometric background masks are not enough.
 
-## Attack 2: FlowBot3D already predicts motion for manipulation.
+## Attack 2: The no-action baseline is unrealistic.
 
-Response: FlowBot3D is a closest hostile prior because it uses flow-like articulation affordances. The boundary is that this paper distinguishes motion that would happen anyway from motion caused by the robot. FlowBot-style articulation flow makes motion useful for manipulation, but does not by itself define a no-action counterfactual effect field.
+Response: This is the main limitation, not a hidden assumption. Family B shows the boundary: 50% passive under-subtraction drops residual success to 0.037, and 75% action-effect leakage yields 0.706 success. The paper claims the residual is the right planning variable when the no-action baseline is calibrated, not that such a baseline is always easy to obtain.
 
-## Attack 3: Action-conditioned dynamics models already compare outcomes across actions.
+## Attack 3: The original evidence was a one-distractor toy.
 
-Response: Many dynamics models can in principle represent this. The paper's claim is that the planner should optimize the action-effect component and that total predicted displacement is provably non-invariant under passive confounding. If a dynamics paper already subtracts the passive no-op dense 3D field and plans on the residual, it is the closest predecessor and should be cited as such.
+Response: v3 replaces the narrow toy with seven synthetic families. Family A sweeps multi-distractor scenes, passive strength, noise, controllable contacts, and baselines. The main multi-distractor setting keeps total-flow success at 0.000 while causal-residual success is 1.000.
 
-## Attack 4: The evidence is synthetic and too easy.
+## Attack 4: A stronger action-conditioned baseline would solve it.
 
-Response: Correct. The result is a controlled counterexample designed to prove the broken assumption matters, not a benchmark claim. The final paper must not claim real-robot superiority.
+Response: The v3 action-conditioned total-flow baseline improves over total flow but does not close the gap: it reaches 0.614 success in the main setting versus 1.000 for the residual and oracle effect. This supports the claim that the optimized variable matters, not just conditioning.
 
-## Attack 5: Estimating the passive future is hard.
+## Attack 5: Spatial overlap or occlusion will break the residual.
 
-Response: Also correct. The proposition includes a passive-estimation margin; the simulation sweeps passive-estimation noise, and the v2 stress directly corrupts the no-action estimate. At confound strength 2.0/noise 0.10, calibrated residual success is 1.000; 50% passive under-subtraction drops success to 0.387; 75% action-effect leakage drops success to 0.505. The mechanism is valuable only when the no-action baseline is more accurate than the action-effect margin and is not trained in a way that leaks robot-caused motion into the passive prediction.
+Response: Family C tests overlap and occlusion directly. Full spatial overlap with no occlusion retains 0.999 success, while occlusion exposes degradation. The paper reports both the robustness and the hard boundary.
 
-## Attack 6: If passive flow is constant across actions, it cancels.
+## Attack 6: Camera ego-motion and global passive fields are ignored.
 
-Response: It cancels for pure action selection over a fixed contact and fixed object. It does not cancel for contact discovery, object selection, moving distractors, waiting/intervention choices, or planners that score dense moving regions.
+Response: Family D adds translation, rotation, conveyor-like, gravity-like, and mixed global passive fields. The residual objective remains the correct estimand when the passive component is estimable; total-flow and global-compensation variants remain vulnerable to local passive distractors.
 
-## Attack 7: Causal language is overkill.
+## Attack 7: Endpoint error is the proper perception metric.
 
-Response: The causal framing prevents a common mistake: treating observed change as controllable affordance. The paper can be read without heavy causal machinery as no-op-differenced flow, but the do-operator clarifies the estimand.
+Response: Family F shows this is false for interaction. A predictor can have low endpoint error relative to total flow and still rank a passive distractor, while a residual estimate can have worse total-flow endpoint error and correct planning rank.
 
-## Attack 8: The planner is trivial.
+## Attack 8: The learned no-op result is too weak.
 
-Response: Yes. That is intentional: a trivial planner isolates the representational failure. More complex MPC can use the same field, but the contribution should not hide behind planner complexity.
+Response: Correct. Family E is only a finite-sample proxy, intentionally scoped as a calibration stress rather than a neural RGB-D solution. The claims ledger marks learned no-op estimation as unsupported.
 
-## Attack 9: The literature sweep uses heuristic extraction.
+## Attack 9: The paper still lacks hardware.
 
-Response: The sweep is broad and auditable, but not a substitute for a final manual related-work pass. The audit must mark this limitation.
+Response: Correct. v3 is ready as a full-scale mechanism/counterexample paper. It should not be sold as a real-robot systems paper.
 
-## Attack 10: The title promises interaction but the experiment is point selection.
+## Attack 10: The planner is simple.
 
-Response: The title is acceptable only if the paper clearly frames interaction as robot-caused physical change and avoids claiming full contact-rich manipulation experiments.
+Response: Yes, intentionally. The simple planner isolates the representational error: optimizing total observed motion can select uncontrollable motion. More complex MPC could use the same residual, but planner complexity is not the contribution.
 
-## Numeric Stress Point
+## Numeric Stress Points
 
-At confound strength 2.0/noise 0.10, total-flow success is 0.000; causal-flow success is 1.000. This is a counterexample regime, not a representative benchmark average.
-
-## V2 Boundary Stress Point
-
-In the same regime, calibrated residual success is 1.000. Under-subtracting passive flow by 50% lowers residual success to 0.387 and raises residual distractor selection to 0.613. Leaking 75% of the action effect into the no-action estimate lowers success to 0.505.
+- Main v3 setting: total-flow success 0.000; causal-residual success 1.000.
+- Total-flow passive-distractor rate: 1.000; causal-residual passive-distractor rate: 0.000.
+- Action-conditioned total-flow baseline success: 0.614.
+- 50% passive under-subtraction: residual success 0.037.
+- 75% action-effect leakage: residual success 0.706.
+- Full overlap with no occlusion: residual success 0.999.

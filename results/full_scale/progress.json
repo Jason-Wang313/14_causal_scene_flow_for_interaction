@@ -1,0 +1,11 @@
+{
+  "stage": "complete",
+  "family_a_rows": 350,
+  "family_b_rows": 360,
+  "family_c_rows": 600,
+  "family_d_rows": 192,
+  "family_e_rows": 216,
+  "family_f_rows": 96,
+  "family_g_rows": 96,
+  "plot_failures": 0
+}

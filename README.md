@@ -4,29 +4,34 @@ Anonymous research-paper workspace for paper 14 in the robotics/embodied-intelli
 
 ## Contents
 
-- `docs/related_work_matrix.csv` - 1000+ paper landscape matrix with skim/deep/hostile labels.
-- `docs/literature_map.md` - field map and assumption inventory.
-- `docs/hostile_prior_work.md` - closest prior-work pressure set.
-- `docs/novelty_boundary_map.md` - what is and is not novel.
-- `experiments/causal_scene_flow_sim.py` - runnable synthetic evidence for passive-vs-agent-caused flow separation.
-- `paper/main.tex` - anonymous ICLR-style manuscript.
+- `docs/related_work_matrix.csv` - 1200-row literature landscape matrix with skim/deep/hostile labels.
+- `docs/full_scale_execution_plan.md` - pre-run v3 hardening plan and acceptance checklist.
+- `docs/experiment_report.md` - concise report for the v3 full-scale experiment package.
+- `experiments/causal_scene_flow_sim.py` - original passive-confound synthetic evidence.
+- `experiments/full_scale_causal_scene_flow.py` - v3 full-scale synthetic experiment runner.
+- `results/full_scale/` - v3 CSV summaries, figures, LaTeX tables, metadata, and progress log.
+- `paper/main.tex` - anonymous ICLR-style manuscript source.
 
 ## Reproduce
 
+Run from the repository root:
+
 ```powershell
-python scripts/literature_sweep.py
-python experiments/causal_scene_flow_sim.py
-python scripts/write_paper_assets.py
-python scripts/build_paper.py
+python experiments\causal_scene_flow_sim.py
+python experiments\full_scale_causal_scene_flow.py
+cd paper
+bibtex main
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-The final compiled paper is written to `C:/Users/wangz/Downloads/14.pdf`.
+The final verified paper is `C:/Users/wangz/Downloads/14.pdf` (25 pages, 389,425 bytes, SHA256 `037834C37314E0671C7267ED778CFD34E84D444D6AB402AD742D92CAB42D5C56`).
 
-## Submission-Hardening v2
+## Submission-Hardening v3
 
-- Added vectorized regeneration for the 80,000-trial synthetic grid.
-- Added passive-baseline misspecification stress in `data/passive_misspecification_stress.csv`.
-- Calibrated no-op residual success is 1.000 at confound 2.0/noise 0.10.
-- Under-subtracting the passive field by 50% lowers residual success to 0.387.
-- Leaking 75% of the robot effect into the no-action estimate lowers residual success to 0.505.
-- Decision remains workshop-only until tested with learned no-op predictors and real or high-fidelity robot scenes.
+- Replaced the 5-page v2 artifact with a 25-page full-scale mechanism paper.
+- Added seven experiment families: multi-distractor passive confounds, passive/no-op misspecification, spatial overlap and occlusion, ego/global passive fields, learned no-op proxy, endpoint-error versus planning mismatch, and ablations.
+- Wrote 1,910 seed-row summaries under `results/full_scale/` with deterministic seeds and no plot failures.
+- Main multi-distractor setting: total-flow success 0.000 and passive-distractor rate 1.000; causal-residual success 1.000 and distractor rate 0.000; action-conditioned total-flow baseline success 0.614.
+- Boundary stress: 50% passive under-subtraction lowers residual success to 0.037; 75% action-effect leakage retains 0.706 success; full spatial overlap with no occlusion retains 0.999 success.
+- Submission decision: ready as a full-scale mechanism/counterexample paper, not as a real-robot systems or learned RGB-D benchmark claim.
