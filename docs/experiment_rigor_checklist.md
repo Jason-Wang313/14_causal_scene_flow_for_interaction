@@ -1,11 +1,11 @@
 # Experiment Rigor Checklist
 
-- Fixed seeds: yes (`14000+` for grid rows, `14200+` for v2 stress rows).
-- Raw grid output: `data/experiment_results.csv`.
-- V2 stress output: `data/passive_misspecification_stress.csv`.
-- Manuscript table artifact: `data/passive_misspecification_table.tex`.
-- Main trials: 40 grid rows x 2,000 trials = 80,000 trials.
-- V2 stress trials: 9 rows x 2,000 trials = 18,000 trials.
-- Baselines: total-flow planner, calibrated residual planner, oracle effect planner, no-subtraction stress endpoint.
-- Stress axes: passive-confound strength, passive-estimation noise, passive under/over-subtraction, action-effect leakage into no-action estimate.
-- Main remaining gap: no learned perception, no hardware, no high-fidelity simulator, and no real passive/no-op data collection protocol.
+- Fixed seeds: yes. Original grid uses deterministic seeds; v3 full-scale runner uses master seed 14014.
+- RAM-light execution: yes. The v3 runner writes summary CSVs, figures, tables, metadata, and progress JSON rather than storing full dense fields for every trial.
+- Original outputs: `data/experiment_results.csv`, `data/experiment_summary.json`, `data/passive_misspecification_stress.csv`.
+- V3 outputs: `results/full_scale/*.csv`, `results/full_scale/*.pdf`, `results/full_scale/*.png`, `results/full_scale/*.tex`, `results/full_scale/metadata.json`, and `results/full_scale/progress.json`.
+- Baselines: total-flow planner, causal residual planner, attention/contact baseline, action-conditioned total-flow baseline, learned no-op proxy, passive-only and random-noop negative controls, and oracle effect planner.
+- Stress axes: number of passive distractors, passive-confound strength, passive-estimation scale error, action-effect leakage, bias direction, spatial overlap, occlusion, ego/global passive fields, finite-sample no-op proxy quality, and endpoint-error/planning mismatch.
+- Metrics: success, passive-distractor selection, caused progress, regret, endpoint error, ranking accuracy, calibration error, false controllability, missed controllable contact, and ablation deltas.
+- Manuscript artifacts: generated v3 figures and LaTeX tables imported directly into `paper/main.tex`.
+- Remaining evidence gap: no real robot, no high-fidelity simulator, and no trained RGB-D no-action predictor.

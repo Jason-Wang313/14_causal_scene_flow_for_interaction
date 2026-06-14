@@ -15,17 +15,17 @@ A manipulation planner then scores contacts or actions with `C_a`, not with tota
 ## Why This Direction Beats Alternatives
 
 - It changes the variable being optimized, not just the model size, data source, benchmark, uncertainty wrapper, verifier, or planner.
-- It directly attacks the hostile scene-flow prior work: they own dense motion, but not action treatment-effect flow.
-- It directly attacks hostile manipulation prior work: they own action-conditioned behavior, but usually do not audit whether the predicted motion is caused by the robot or passive background dynamics.
-- It is testable with a crisp counterexample and a runnable stress test.
+- It directly attacks scene-flow prior work: prior work owns dense motion prediction, but not intervention-defined robot-caused dense motion as the planning objective.
+- It directly attacks manipulation prior work: action-conditioned prediction may model outcomes, but the paper audits whether the predicted motion is caused by the robot or by passive background dynamics.
+- The v3 evidence now tests the mechanism across multi-distractor scenes, misspecification surfaces, overlap and occlusion, ego/global passive fields, learned no-op proxies, endpoint-error mismatch, and ablations.
 
 ## Rejected Directions
 
-- A new 3D scene-flow architecture: too close to FlowNet3D/RAFT-3D/PointPWC/NSFP and a forbidden bigger-model move.
+- A new 3D scene-flow architecture: too close to FlowNet3D, RAFT-3D, PointPWC, NSFP, and other established perception work.
 - A new benchmark only: useful, but insufficient without a central mechanism.
 - A planner that adds uncertainty to flow: uncertainty does not identify causal effect.
-- LLM or reinforcement-learning planning over scene flow: forbidden weak move and not necessary for the causal claim.
+- LLM or reinforcement-learning planning over scene flow: unnecessary for the causal estimand claim.
 
 ## Final Choice
 
-Proceed with an ICLR-style paper titled `Causal Scene Flow for Interaction`, focused on causal effect-flow decomposition and its planning consequences.
+Proceed with `Causal Scene Flow for Interaction` as a mechanism/counterexample paper. The novelty is the planning estimand and its failure analysis, not a new RGB-D architecture or real-robot benchmark.

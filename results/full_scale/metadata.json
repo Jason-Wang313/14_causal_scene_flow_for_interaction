@@ -1,0 +1,21 @@
+{
+  "master_seed": 14014,
+  "families": [
+    "multi_distractor",
+    "misspecification",
+    "spatial_overlap",
+    "egomotion",
+    "learned_noop_proxy",
+    "metric_mismatch",
+    "ablation"
+  ],
+  "headline": {
+    "main_total_success": 0.0,
+    "main_causal_success": 1.0,
+    "main_total_distractor": 1.0,
+    "main_causal_distractor": 0.0,
+    "leak_075_success": 0.7058571428571428,
+    "scale_050_success": 0.036571428571428574,
+    "overlap_100_success": 0.9993333333333334
+  }
+}

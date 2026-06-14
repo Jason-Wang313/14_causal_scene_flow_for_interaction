@@ -1,21 +1,33 @@
 # Submission Attack Log
 
-Checked: 2026-06-12 23:46:59 +01:00
+Checked: 2026-06-14
 
 ## Hostile Round 1: This is just a perfect no-op subtraction toy
 
-Result: Recoverable.
+Result: Addressed for mechanism-scope submission.
 
-Action: Added passive-baseline misspecification stress at the same confound 2.0/noise 0.10 setting used by the main counterexample. The calibrated residual planner succeeds in 1.000 of trials, but 50% passive under-subtraction drops success to 0.387 and 75% action-effect leakage into the no-action estimate drops success to 0.505.
+Action: Added seven v3 experiment families. The suite includes multi-distractor scenes, passive scale and leakage surfaces, spatial overlap and occlusion, ego/global passive fields, a learned no-op proxy, endpoint-error mismatch, and ablations.
 
 ## Hostile Round 2: The paper overpromises learned robot performance
 
-Result: Claim narrowed.
+Result: Claim narrowed and made explicit.
 
-Action: The abstract, results, claims ledger, reviewer attacks, and limitations now say this is a mechanism-and-counterexample paper, not a learned RGB-D or real-robot system.
+Action: The claims ledger, readiness decision, manuscript limitations, and reviewer response all state that this is a full-scale mechanism/counterexample paper, not a real-robot system or learned RGB-D benchmark result.
 
 ## Hostile Round 3: Runtime and reproducibility are fragile
 
-Result: Recoverable.
+Result: Addressed.
 
-Action: Added a vectorized deterministic path for the 80,000-trial grid. The experiment now regenerates the full grid and v2 stress table in about 19 seconds on the local machine.
+Action: The v3 runner uses deterministic seeds, sequential family execution, compact CSV summaries, progress JSON, metadata JSON, and regenerated LaTeX tables/figures under `results/full_scale/`.
+
+## Hostile Round 4: Stronger baselines might close the gap
+
+Result: Partially addressed.
+
+Action: Added attention/contact scoring, action-conditioned total-flow, learned no-op proxy, passive-only negative control, random no-op residual, and oracle effect. In the main setting, action-conditioned total flow reaches 0.614 success while causal residual and oracle effect reach 1.000.
+
+## Hostile Round 5: Endpoint error is enough
+
+Result: Addressed as a conceptual attack.
+
+Action: Family F constructs low-endpoint-error but wrong-ranking and higher-endpoint-error but correct-ranking estimators. The manuscript now argues that interaction perception must report effect-ranking metrics, not only total-flow endpoint error.

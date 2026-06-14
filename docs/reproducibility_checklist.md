@@ -3,19 +3,37 @@
 Run from the repository root:
 
 ```powershell
+python -m py_compile experiments\full_scale_causal_scene_flow.py experiments\causal_scene_flow_sim.py
 python experiments\causal_scene_flow_sim.py
+python experiments\full_scale_causal_scene_flow.py
 ```
 
-Expected artifacts:
+Then build from `paper/`:
 
-- `data/experiment_results.csv`
-- `data/experiment_summary.json`
-- `data/passive_misspecification_stress.csv`
-- `data/passive_misspecification_table.tex`
-- `figures/passive_confounding_success.pdf`
-- `figures/passive_confounding_success.png`
-- `figures/example_scene_flow_decomposition.pdf`
-- `figures/example_scene_flow_decomposition.png`
-- `docs/evidence_summary.md`
+```powershell
+bibtex main
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+```
 
-The script uses deterministic seeds and a NumPy vectorized path when NumPy is installed. A scalar fallback remains in the code path, but the vectorized path is the validated local configuration.
+Expected v3 artifacts:
+
+- `results/full_scale/family_a_multidistractor_seed.csv`
+- `results/full_scale/family_b_misspecification_seed.csv`
+- `results/full_scale/family_c_overlap_seed.csv`
+- `results/full_scale/family_d_egomotion_seed.csv`
+- `results/full_scale/family_e_learned_noop_seed.csv`
+- `results/full_scale/family_f_metric_mismatch_seed.csv`
+- `results/full_scale/family_g_ablation_seed.csv`
+- `results/full_scale/figure_*.pdf`
+- `results/full_scale/table_*.tex`
+- `results/full_scale/metadata.json`
+- `results/full_scale/progress.json`
+- `docs/experiment_report.md`
+
+Expected verification:
+
+- `progress.json` has stage `complete`.
+- `metadata.json` headline has total-flow success 0.0, causal-residual success 1.0, 50% passive under-subtraction success about 0.037, and 75% leakage success about 0.706.
+- Final manuscript builds to 25 pages.
+- Log scan has no unresolved citations, undefined references, LaTeX errors, fatal stops, missing files, or overfull boxes.
