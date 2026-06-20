@@ -37,3 +37,13 @@ Expected verification:
 - `metadata.json` headline has total-flow success 0.0, causal-residual success 1.0, 50% passive under-subtraction success about 0.037, and 75% leakage success about 0.706.
 - Final manuscript builds to 25 pages.
 - Log scan has no unresolved citations, undefined references, LaTeX errors, fatal stops, missing files, or overfull boxes.
+
+## Final Export Verification
+
+- Canonical PDF: `C:/Users/wangz/Downloads/14.pdf`
+- Pages: 25
+- Size: 389,425 bytes
+- SHA256: `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`
+- VLA-style boxed-link inventory: 64 annotations on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`; green = 48, red = 16, cyan = 0; all borders `(0, 0, 1)`.
+- Visual render audit: pages 1, 2, 4, 5, 7, and 8 checked after export.
+- Local build artifact: `paper/main.pdf` removed after export.

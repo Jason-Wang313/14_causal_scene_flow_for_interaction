@@ -10,7 +10,9 @@
 - Build result: success
 - Final Downloads PDF size: 389,425 bytes
 - Final Downloads PDF pages: 25
-- Final Downloads SHA256: `037834C37314E0671C7267ED778CFD34E84D444D6AB402AD742D92CAB42D5C56`
+- Final Downloads SHA256: `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`
+- Final boxed-link inventory: 64 annotations on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`; green = 48, red = 16, cyan = 0; all borders `(0, 0, 1)`.
+- Final boxed-link visual audit: pages 1, 2, 4, 5, 7, and 8 rendered after export with crisp, aligned boxes.
 - Local `paper/main.pdf` after final copy: removed
 
 ## Commands

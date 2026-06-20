@@ -1,6 +1,6 @@
 # Submission Attack Log
 
-Checked: 2026-06-14
+Checked: 2026-06-20
 
 ## Hostile Round 1: This is just a perfect no-op subtraction toy
 
@@ -31,3 +31,9 @@ Action: Added attention/contact scoring, action-conditioned total-flow, learned 
 Result: Addressed as a conceptual attack.
 
 Action: Family F constructs low-endpoint-error but wrong-ranking and higher-endpoint-error but correct-ranking estimators. The manuscript now argues that interaction perception must report effect-ranking metrics, not only total-flow endpoint error.
+
+## Hostile Round 6: PDF link styling may silently drift from the VLA role model
+
+Result: Incorporated.
+
+Action: Added explicit `\hypersetup` policy in `paper/main.tex`, rebuilt the final PDF, and verified 64 boxed link annotations: green = 48, red = 16, cyan = 0, all with border `(0, 0, 1)`. Rendered affected pages 1, 2, 4, 5, 7, and 8 and confirmed the boxes are visually crisp and aligned.
