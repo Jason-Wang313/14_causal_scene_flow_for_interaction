@@ -4,14 +4,16 @@
 - Slug: `causal_scene_flow_for_interaction`
 - Title: `Causal Scene Flow for Interaction`
 - Terminal assessment: ready as a full-scale mechanism/counterexample paper under the stated claim scope
-- Audit date: 2026-06-14
+- Audit date: 2026-06-20
 
 ## Required Outputs
 
 - Downloads PDF: `C:/Users/wangz/Downloads/14.pdf`
 - PDF size: 389,425 bytes
 - PDF pages: 25
-- SHA256: `037834C37314E0671C7267ED778CFD34E84D444D6AB402AD742D92CAB42D5C56`
+- SHA256: `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`
+- VLA-style boxed-link audit: 64 link annotations on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`; colors green = 48, red = 16, cyan = 0; all borders `(0, 0, 1)`.
+- Visual link audit: pages 1, 2, 4, 5, 7, and 8 rendered after export; green citation/URL boxes and red internal-reference boxes are crisp and aligned.
 - Local build PDF after final copy: removed (`paper/main.pdf` does not exist)
 - Desktop PDF: no new Desktop copy created during v3 hardening
 - Source repository folder: `C:/Users/wangz/robotics_60_paper_batch/14_causal_scene_flow_for_interaction`

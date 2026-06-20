@@ -25,7 +25,14 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-The final verified paper is `C:/Users/wangz/Downloads/14.pdf` (25 pages, 389,425 bytes, SHA256 `037834C37314E0671C7267ED778CFD34E84D444D6AB402AD742D92CAB42D5C56`).
+The final verified paper is `C:/Users/wangz/Downloads/14.pdf` (25 pages, 389,425 bytes, SHA256 `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`).
+
+VLA-style boxed-link verification:
+
+- Link annotations: 64 total on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`.
+- Annotation colors: green = 48, red = 16, cyan = 0.
+- Border widths: `(0, 0, 1)` for all link annotations.
+- Visual audit: rendered pages 1, 2, 4, 5, 7, and 8; green citation/URL boxes and red internal-reference boxes are crisp and aligned.
 
 ## Submission-Hardening v3
 

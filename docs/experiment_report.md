@@ -26,3 +26,12 @@
 - Tables: `results/full_scale/table_*.tex`
 - Metadata: `results/full_scale/metadata.json`
 - Progress: `results/full_scale/progress.json`
+
+## Final Artifact
+
+- Canonical PDF: `C:/Users/wangz/Downloads/14.pdf`
+- Pages: 25
+- Size: 389,425 bytes
+- SHA256: `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`
+- VLA-style boxed-link inventory: 64 annotations on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`; green = 48, red = 16, cyan = 0; all borders `(0, 0, 1)`.
+- Visual audit: rendered pages 1, 2, 4, 5, 7, and 8 after export and confirmed crisp, aligned link boxes.

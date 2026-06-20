@@ -26,3 +26,12 @@ The v3 evidence package is a synthetic intervention suite designed to isolate th
 ## Interpretation
 
 The evidence supports the mechanism claim that planning on total flow is not invariant to passive exogenous motion, while planning on a do-difference residual is the right estimand when the no-action baseline is calibrated enough to preserve action-effect margins. It does not support claims about real-robot performance, learned RGB-D estimator accuracy, or benchmark superiority over deployed manipulation systems.
+
+## Final PDF
+
+- Path: `C:/Users/wangz/Downloads/14.pdf`
+- Pages: 25
+- Size: 389,425 bytes
+- SHA256: `3CB0713C86F0DABBBCF325599FD36213A3D5C8A7AC3EE7BA17D102EC968C548B`
+- VLA-style boxed-link audit: 64 annotations on pages `[(1, 19), (2, 29), (4, 4), (5, 6), (7, 4), (8, 2)]`; green = 48, red = 16, cyan = 0; all borders `(0, 0, 1)`.
+- Visual audit: rendered pages 1, 2, 4, 5, 7, and 8 after export; citation/URL and internal-reference boxes are crisp and aligned.

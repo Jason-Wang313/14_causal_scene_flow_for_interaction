@@ -10,6 +10,8 @@ Submission-safe claim:
 
 Robots should plan interaction with a dense action-effect flow, defined by a state-conditioned action/no-action difference, because total scene flow is not invariant to passive exogenous motion and can select uncontrollable distractors.
 
+The 2026-06-20 export also matches the visible VLA-v4 boxed-link convention: green citation/URL boxes, red internal-reference boxes, one-point borders, and no cyan link boxes in the audited final PDF.
+
 Claims to avoid:
 
 - Do not claim real-robot superiority.
